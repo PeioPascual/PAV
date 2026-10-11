@@ -19,3 +19,6 @@ PAV.au: Sun/NeXT audio data: 8-bit ISDN mu-law, mono, 8000 Hz
 # PDF 2
 ## Exercici bàsic 5
 He generat el nou fitxer PAV.txt però no l'he comparat amb el wavesurfer.
+
+## Exercici ampliació 2
+He generat el fitxer, no els he comparat.
