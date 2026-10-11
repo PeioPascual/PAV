@@ -13,6 +13,8 @@ int main(int argc, char *argv[]) {
     float *x;
     short *buffer;
     FILE  *fpWave;
+    FILE *output = stdout, *tmp = NULL;
+    short retcd = 0;
 
     if (argc != 2 && argc != 3) {
         fprintf(stderr, "Empleo: %s inputfile [outputfile]\n", argv[0]);
@@ -28,14 +30,25 @@ int main(int argc, char *argv[]) {
     if ((buffer = malloc(N * sizeof(*buffer))) == 0 ||
         (x = malloc(N * sizeof(*x))) == 0) {
         fprintf(stderr, "Error al ubicar los vectores (%s)\n", strerror(errno));
+        cierra_wave(fpWave);
+        free(buffer);
+        free(x);
         return -1;
     }
 
     trm = 0;
+    if (argc == 3) {
+        if ((tmp = fopen(argv[2], "w")) == NULL) {
+            fprintf(stderr, "Error al escribir en el fichero de salida %s (%s)\nSe escribirá por stdout\n\n", argv[2], strerror(errno));
+            retcd = 1;
+        } else {
+            output = tmp;
+        }
+    }
     while (lee_wave(buffer, sizeof(*buffer), N, fpWave) == N) {
         for (int n = 0; n < N; n++) x[n] = buffer[n] / (float) (1 << 15);
 
-        printf("%d\t%f\t%f\t%f\n", trm, compute_power(x, N),
+        fprintf(output, "%d\t%f\t%f\t%f\n", trm, compute_power(x, N),
                                         compute_am(x, N),
                                         compute_zcr(x, N, fm));
         trm += 1;
@@ -45,5 +58,9 @@ int main(int argc, char *argv[]) {
     free(buffer);
     free(x);
 
-    return 0;
+    if (tmp != NULL) {
+        fclose(output);
+    }
+
+    return retcd;
 }

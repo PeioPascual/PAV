@@ -3,11 +3,16 @@
 
 FILE    *abre_wave(const char *ficWave, float *fm) {
     FILE    *fpWave;
+    unsigned int freq;
 
     if ((fpWave = fopen(ficWave, "r")) == NULL) return NULL;
-    if (fseek(fpWave, 44, SEEK_SET) < 0) return NULL;
 
-    *fm = 16000;
+    if (fseek(fpWave, 24, SEEK_SET) < 0) return NULL;
+    if (fread(&freq, 4, 1, fpWave) == 1) {
+        *fm = (float)freq;
+    }
+
+    if (fseek(fpWave, 44, SEEK_SET) < 0) return NULL;
 
     return fpWave;
 }
